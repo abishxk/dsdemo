@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useReducedMotion } from "../hooks/useReducedMotion";
@@ -94,6 +94,23 @@ export function Book() {
 
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
 
+  // Mobile Safari/Chrome pin the page to keep a focused field above the
+  // keyboard, but don't reliably re-scroll once the keyboard closes — the
+  // page is left stuck at that offset. When the visual viewport grows back
+  // (keyboard closing), nudge the scroll position to force it to resync.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    let prevHeight = vv.height;
+    function handleResize() {
+      const grew = vv!.height > prevHeight;
+      prevHeight = vv!.height;
+      if (grew) window.scrollTo(window.scrollX, window.scrollY);
+    }
+    vv.addEventListener("resize", handleResize);
+    return () => vv.removeEventListener("resize", handleResize);
+  }, []);
+
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
     setErrors((e) => ({ ...e, [key]: "" }));
@@ -185,7 +202,7 @@ export function Book() {
 
   if (submitted) {
     return (
-      <section className="flex min-h-screen items-center justify-center bg-bg px-5 pt-24">
+      <section className="flex min-h-dvh items-center justify-center bg-bg px-5 pt-24">
         <Container className="max-w-lg text-center">
           <CheckCircle2 className="mx-auto h-14 w-14 text-blue-bright" aria-hidden="true" />
           <h1 className="mt-6 font-heading text-4xl font-semibold tracking-wide">REQUEST RECEIVED</h1>
@@ -206,7 +223,7 @@ export function Book() {
   }
 
   return (
-    <section className="min-h-screen bg-bg pb-32 pt-28">
+    <section className="min-h-dvh bg-bg pb-44 pt-28 sm:pb-32">
       <Container className="max-w-2xl">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-blue-a11y">Request Appointment</p>
         <h1 className="mt-2 font-heading text-4xl font-semibold tracking-wide">Book Your Detail</h1>
@@ -461,7 +478,7 @@ export function Book() {
             </AnimatePresence>
           </div>
 
-          <div className="mt-10 flex items-center justify-between">
+          <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between border-t border-white/10 bg-bg/95 px-5 py-4 backdrop-blur [padding-bottom:max(1rem,env(safe-area-inset-bottom))] sm:static sm:z-auto sm:mt-10 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:[padding-bottom:0] sm:backdrop-blur-none">
             <Button type="button" variant="ghost" onClick={goBack}>
               Back
             </Button>
