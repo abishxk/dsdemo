@@ -32,15 +32,15 @@ export function ReviewsSection({ as: Heading = "h2", alignTop = false }: { as?: 
             sit, reading as "huge padding" even though the padding itself was
             fine. `alignTop` swaps to top-alignment for that one case. */}
         <div className={cn("grid gap-10 lg:grid-cols-5 lg:gap-12", alignTop ? "lg:items-start" : "lg:items-center")}>
-          <Reveal className="lg:col-span-2">
+          <Reveal className="text-center lg:col-span-2 lg:text-left">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-blue-a11y">Reviews</p>
             <Heading className="mt-3 font-heading text-4xl font-semibold leading-[1.05] tracking-wide text-balance sm:text-wrap lg:text-5xl">
               DON'T TAKE OUR WORD FOR IT.
             </Heading>
 
-            <div className="mt-7 flex items-center gap-3">
+            <div className="mt-7 flex items-center justify-center gap-3 lg:justify-start">
               <span className="font-heading text-4xl font-semibold tracking-wide">{business.rating}</span>
-              <div>
+              <div className="text-left">
                 <StarRating rating={business.rating} />
                 <p className="mt-1 text-xs text-muted">{business.reviewCount} reviews</p>
               </div>
